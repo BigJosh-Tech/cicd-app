@@ -1,23 +1,26 @@
-name: Node.js CI/CD
-
-on:
+name: NodeJs CICD
+on: 
   push:
-    branches: [ "main" ]
-
-jobs:
-  build:
-    runs-on: self-hosted
-    strategy:
+    branches:
+      - master
+jobs:  
+  build: 
+    strategy: 
       matrix:
-        node-version: [18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [16, 18, 20]
+        operating-system: [ self-hosted ]
+    runs-on: ${{  matrix.operating-system  }}
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm test
-    - run: pm2 restart backendserver
+      - name: Get code
+        uses: actions/checkout@v4
+      - name: install NodeJS
+        uses: actions/setup-node@v4
+        with: 
+          node-version: ${{  matrix.node-version   }}
+          cache: 'npm'
+      - name: install Dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+      - name: Restart server
+        run: sudo pm2 restart backendserver
